@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5977128472333330392}
   - component: {fileID: 4447122971540316147}
   - component: {fileID: 5916778241334527922}
+  - component: {fileID: 5864182834827575100}
   m_Layer: 0
   m_Name: BottleJuice
   m_TagString: Untagged
@@ -116,3 +117,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5012bf4451877424387d48ad80465d9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!65 &5864182834827575100
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 176279171071588824}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.450234, y: 2.6317987, z: 1.450234}
+  m_Center: {x: 0, y: 1.3377886, z: 0.78688294}

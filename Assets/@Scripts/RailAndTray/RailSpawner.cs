@@ -20,6 +20,7 @@ public class RailSpawner : SpawnerBase
 
             if (railObj != null)
             {
+                railObj.Init(key);
                 railObj.MoveToY(_targetY, moveDuration, () =>
                 {
                     PoolManager.Instance.Despawn(key, obj);

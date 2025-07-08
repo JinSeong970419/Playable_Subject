@@ -20,7 +20,6 @@ public abstract class SpawnerBase : MonoBehaviour
         _spawnLoop = DOVirtual.DelayedCall(spawnInterval, () =>
         {
             SpawnLine();
-            //BeginSpawning();
         });
     }
 

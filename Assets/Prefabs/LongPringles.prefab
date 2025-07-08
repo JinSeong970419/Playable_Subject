@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2536388313787013700}
   - component: {fileID: 7138260467532721942}
   - component: {fileID: -7023003320448273817}
+  - component: {fileID: 7426295082842252231}
   m_Layer: 0
   m_Name: LongPringles
   m_TagString: Untagged
@@ -116,3 +117,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5012bf4451877424387d48ad80465d9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!65 &7426295082842252231
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 954420075762175384}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.4759834, y: 2.6195793, z: 1.4759836}
+  m_Center: {x: 0, y: 1.3048618, z: 0.8085798}
