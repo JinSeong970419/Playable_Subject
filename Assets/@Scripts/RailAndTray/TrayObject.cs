@@ -1,44 +1,56 @@
 using DG.Tweening;
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class TrayObject : MonoBehaviour
 {
-    [SerializeField] private List<TrayObject> trayObjects;
     [SerializeField] private Transform poolKeyUI;
-
-    private PoolKey poolKey;  // TrayObject Ű
-    public PoolKey PoolKey => poolKey;
-
+    [SerializeField] private TextMeshProUGUI objCount;
     [SerializeField] private List<TraySlot> traySlots;
+
     private PoolKey targetKey;
-    private GameObject targetobj;
+    private GameObject targetObj;
+    private int trayCount;
 
     public void SetTargetKey(PoolKey key)
     {
         targetKey = key;
-        targetobj = PoolManager.Instance.Spawn(key, poolKeyUI.position, Quaternion.identity, poolKeyUI);
-        targetobj.transform.localScale = new Vector3(5f, 5f, 5f);
+        targetObj = PoolManager.Instance.Spawn(key, poolKeyUI.position, Quaternion.identity, poolKeyUI);
+        targetObj.transform.localScale = new Vector3(5, 5, 1);
     }
 
     public void Clear()
     {
-        PoolManager.Instance.Despawn(targetKey, targetobj);
-        traySlots.ForEach(x => x.Clear());
+        if (targetObj != null)
+        {
+            targetObj.transform.localScale = new Vector3(100,100,1);
+            PoolManager.Instance.Despawn(targetKey, targetObj);
+            targetObj = null;
+        }
+
+        foreach (var slot in traySlots) slot.Clear();
+
+        trayCount = 0;
+        UpdateCountUI();
     }
 
-    public void OnRailClicked(RailObject railobj)
+    public void OnRailClicked(RailObject railObj)
     {
-        if (railobj.PoolKey != targetKey) return;
+        if (railObj.PoolKey != targetKey) return;
 
         foreach (var slot in traySlots)
         {
             if (!slot.IsOccupied)
             {
-                railobj.MoveStop();
-                slot.Receive(railobj);
-                return;
+                railObj.MoveStop();
+                slot.Receive(railObj, () =>
+                {
+                    trayCount++;
+                    UpdateCountUI();
+                });
+                break;
             }
         }
     }
@@ -46,8 +58,9 @@ public class TrayObject : MonoBehaviour
     public void MoveToY(float targetY, float duration, Action onComplete)
     {
         transform.DOKill();
-
-        Vector3 target = new(transform.position.x, targetY, transform.position.z);
+        var target = new Vector3(transform.position.x, targetY, transform.position.z);
         transform.DOMove(target, duration).SetEase(Ease.Linear).OnComplete(() => onComplete?.Invoke());
     }
+
+    private void UpdateCountUI() => objCount.text = string.Concat("/ ", traySlots.Count - trayCount);
 }

@@ -1,43 +1,35 @@
 using UnityEngine;
-using DG.Tweening;
 
 public class RailSpawner : SpawnerBase
 {
-    public float railTargetOffset = 8f;
+    [LunaPlaygroundField("Object Spawn Interval (x10)", 10, "Object spawn interval in 0.1 sec units")]
+    public int objectSpawnIntervalRaw = 10;
+
+    protected override float SpawnInterval => objectSpawnIntervalRaw * 0.1f;
+
+    [SerializeField] private float railTargetOffset = 8f;
+    private Vector3 targetScale = new Vector3(30, 30, 10);
 
     protected override void SpawnLine()
     {
+        var keys = (PoolKey[])System.Enum.GetValues(typeof(PoolKey));
+
         for (int i = 0; i < spawnPoints.Length; i++)
         {
-            Vector3 spawnPos = spawnPoints[i].position;
+            var spawnPos = spawnPoints[i].position;
+            var key = keys[Random.Range(0, keys.Length - 1)];
 
-            PoolKey[] keys = (PoolKey[])System.Enum.GetValues(typeof(PoolKey));
-            int rand = Random.Range(0, keys.Length -1);
-            PoolKey key = keys[rand];
+            var obj = PoolManager.Instance.Spawn(key, spawnPos, Quaternion.identity, spawnPoints[i]);
+            var railObj = obj.GetComponent<RailObject>();
+            railObj.transform.localScale = targetScale;
 
-            GameObject obj = PoolManager.Instance.Spawn(key, spawnPos, Quaternion.identity, spawnPoints[i]);
-            RailObject railObj = obj.GetComponent<RailObject>();
+            if (railObj == null) continue;
 
-            if (railObj != null)
+            railObj.Init(key);
+            railObj.MoveToY(spawnPos.y + railTargetOffset, MoveDuration, () =>
             {
-                railObj.Init(key);
-                railObj.MoveToY(_targetY, moveDuration, () =>
-                {
-                    PoolManager.Instance.Despawn(key, obj);
-                });
-            }
+                PoolManager.Instance.Despawn(key, obj);
+            });
         }
-
-        DOVirtual.DelayedCall(spawnInterval, SpawnLine);
-    }
-
-    protected override Vector3 GetSpawnPosition(int index)
-    {
-        return spawnPoints[index].position;
-    }
-
-    protected override Vector3 GetTargetPosition(Vector3 spawnPos)
-    {
-        return new Vector3(spawnPos.x, spawnPos.y + railTargetOffset, spawnPos.z);
     }
 }

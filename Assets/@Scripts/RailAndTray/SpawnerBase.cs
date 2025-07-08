@@ -3,35 +3,29 @@ using UnityEngine;
 
 public abstract class SpawnerBase : MonoBehaviour
 {
-    public Transform[] spawnPoints;
-    public float moveDuration = 3f;
-    public float _targetY = 5f;
-    public float spawnInterval = 0.3f;
+    [SerializeField] protected Transform[] spawnPoints;
+    [SerializeField] private float moveDuration = 3f;
+    [SerializeField] private float targetY = 5f;
 
-    private Tween _spawnLoop;
+    private Sequence _spawnLoop;
 
-    protected virtual void Start()
-    {
-        //DOVirtual.DelayedCall(spawnInterval, SpawnLine);
-    }
+    protected float MoveDuration => moveDuration;
+    protected float TargetY => targetY;
+    protected abstract float SpawnInterval { get; }
+
+    protected virtual void OnEnable() => BeginSpawning();
+    protected virtual void OnDisable() => StopSpawning();
 
     public void BeginSpawning()
     {
-        _spawnLoop = DOVirtual.DelayedCall(spawnInterval, () =>
-        {
-            SpawnLine();
-        });
+        StopSpawning();
+        _spawnLoop = DOTween.Sequence()
+            .AppendCallback(SpawnLine)
+            .AppendInterval(SpawnInterval)
+            .SetLoops(-1);
     }
 
-    public void StopSpawning()
-    {
-        if (_spawnLoop != null && _spawnLoop.IsActive())
-            _spawnLoop.Kill();
-    }
+    public void StopSpawning() => _spawnLoop?.Kill();
 
     protected abstract void SpawnLine();
-
-    protected abstract Vector3 GetSpawnPosition(int index);
-
-    protected abstract Vector3 GetTargetPosition(Vector3 spawnPos);
 }

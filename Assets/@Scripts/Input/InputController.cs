@@ -7,22 +7,10 @@ public class InputController : MonoBehaviour
 
     void Update()
     {
-#if UNITY_EDITOR || UNITY_STANDALONE
         if (Input.GetMouseButtonDown(0))
         {
             HandleInput(Input.mousePosition);
         }
-#elif UNITY_IOS || UNITY_ANDROID
-        if (Input.touchCount > 0)
-        {
-            var touch = Input.GetTouch(0);
-
-            if (touch.phase == TouchPhase.Began)
-            {
-                HandleInput(touch.position);
-            }
-        }
-#endif
     }
 
     private void HandleInput(Vector2 screenPos)

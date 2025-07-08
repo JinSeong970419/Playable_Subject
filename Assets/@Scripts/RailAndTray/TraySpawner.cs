@@ -6,9 +6,17 @@ public class TraySpawner : SpawnerBase
 {
     public static TraySpawner Instance { get; private set; }
 
-    [SerializeField] private List<TrayObject> trayObjects;
+    [SerializeField] private List<TrayObject> trayObjects = new();
 
-    void Awake()
+    [LunaPlaygroundField("Tray Spawn Interval (x10)", 50, "Tray spawn interval in 0.1 sec units")]
+    public int traySpawnIntervalRaw = 50;
+
+    protected override float SpawnInterval => traySpawnIntervalRaw * 0.1f;
+
+    [SerializeField] private Transform spawnPoint;
+    [SerializeField] private float trayEndY = -2f;
+
+    private void Awake()
     {
         if (Instance != null)
         {
@@ -18,51 +26,30 @@ public class TraySpawner : SpawnerBase
         Instance = this;
     }
 
-    public float trayEndY = -2f;
-
-    [Header("트레이 세팅")]
-    public Transform spawnPoint;
-
     protected override void SpawnLine()
     {
-        PoolKey key = PoolKey.Tray;
-        Vector3 spawnPos = spawnPoint.position;
+        var key = PoolKey.Tray;
+        var spawnPos = spawnPoint.position;
 
-        GameObject obj = PoolManager.Instance.Spawn(key, spawnPos, Quaternion.identity, spawnPoint);
-        TrayObject tray = obj.GetComponent<TrayObject>();
+        var obj = PoolManager.Instance.Spawn(key, spawnPos, Quaternion.identity, spawnPoint);
+        var tray = obj.GetComponent<TrayObject>();
 
-        var randomKey = (PoolKey)Random.Range(0, System.Enum.GetValues(typeof(PoolKey)).Length -1);
+        var keys = (PoolKey[])System.Enum.GetValues(typeof(PoolKey));
+        var randomKey = keys[Random.Range(0, keys.Length - 1)];
         tray.SetTargetKey(randomKey);
 
-        if (tray != null)
-        {
-            trayObjects.Add(tray);
-            tray.MoveToY(trayEndY, moveDuration, () =>
-            {
-                trayObjects.Remove(tray);
-                tray.Clear();
-                PoolManager.Instance.Despawn(key, obj);
-            });
-        }
+        trayObjects.Add(tray);
 
-        DOVirtual.DelayedCall(spawnInterval, SpawnLine);
+        tray.MoveToY(trayEndY, MoveDuration, () =>
+        {
+            trayObjects.Remove(tray);
+            tray.Clear();
+            PoolManager.Instance.Despawn(key, obj);
+        });
     }
 
     public void NotifyTrayObjects(RailObject clickedRail)
     {
-        foreach (var tray in trayObjects)
-        {
-            tray.OnRailClicked(clickedRail);
-        }
-    }
-
-    protected override Vector3 GetSpawnPosition(int index)
-    {
-        return spawnPoints[index].position;
-    }
-
-    protected override Vector3 GetTargetPosition(Vector3 spawnPos)
-    {
-        return new Vector3(spawnPos.x, trayEndY, spawnPos.z);
+        foreach (var tray in trayObjects) tray.OnRailClicked(clickedRail);
     }
 }

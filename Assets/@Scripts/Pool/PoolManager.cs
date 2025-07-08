@@ -6,30 +6,30 @@ public class PoolManager : MonoBehaviour
     public static PoolManager Instance { get; private set; }
 
     [Header("Ç® ¼¼ÆÃ")]
-    public List<PoolItem> poolItem;
+    [SerializeField] private List<PoolItem> poolItems;
 
-    private Dictionary<PoolKey, Queue<GameObject>> _poolDict = new();
-    private Dictionary<PoolKey, GameObject> _prefabDict = new();
+    private readonly Dictionary<PoolKey, Queue<GameObject>> _poolDict = new();
+    private readonly Dictionary<PoolKey, GameObject> _prefabDict = new();
 
     private void Awake()
     {
-        if(Instance != null)
+        if (Instance != null)
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
             return;
         }
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
         InitializePools();
     }
 
     private void InitializePools()
     {
-        foreach (var item in poolItem)
+        foreach (var item in poolItems)
         {
-            Queue<GameObject> objectQueue = new();
+            var objectQueue = new Queue<GameObject>();
+
             for (int i = 0; i < item.initialSize; i++)
             {
                 var obj = Instantiate(item.prefab);
@@ -44,21 +44,13 @@ public class PoolManager : MonoBehaviour
 
     public GameObject Spawn(PoolKey key, Vector3 position, Quaternion rotation, Transform parent = null)
     {
-        GameObject obj = null;
-
-        if (!_poolDict.ContainsKey(key))
+        if (!_poolDict.TryGetValue(key, out var queue) || !_prefabDict.TryGetValue(key, out var prefab))
             return null;
 
-        if (_poolDict[key].Count > 0)
-            obj = _poolDict[key].Dequeue();
-        else
-            obj = Instantiate(_prefabDict[key]);
+        var obj = queue.Count > 0 ? queue.Dequeue() : Instantiate(prefab);
 
         obj.transform.SetPositionAndRotation(position, rotation);
-
-        if(parent != null)
-            obj.transform.SetParent(parent);
-
+        obj.transform.SetParent(parent, false);
         obj.SetActive(true);
 
         return obj;
@@ -66,7 +58,7 @@ public class PoolManager : MonoBehaviour
 
     public void Despawn(PoolKey key, GameObject obj)
     {
-        if(!_poolDict.ContainsKey(key))
+        if (!_poolDict.TryGetValue(key, out var queue))
         {
             Destroy(obj);
             return;
@@ -74,6 +66,6 @@ public class PoolManager : MonoBehaviour
 
         obj.SetActive(false);
         obj.transform.SetParent(null);
-        _poolDict[key].Enqueue(obj);
+        queue.Enqueue(obj);
     }
 }

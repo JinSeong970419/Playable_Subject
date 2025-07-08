@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 public enum GameState
@@ -15,10 +16,14 @@ public class GameController : MonoBehaviour
 
     private GameState _state = GameState.Ready;
 
+    // 게임 시간
+    [LunaPlaygroundField("Game End Delay (sec)", 20, "Delay in seconds before game ends after action")]
+    public int endTime = 20;
+
     void Start()
     {
-        // 임시 게임 자동 시작
         StartGame();
+        DOVirtual.DelayedCall(endTime, EndGame);
     }
 
     public void StartGame()
@@ -49,6 +54,9 @@ public class GameController : MonoBehaviour
             traySpawner.StopSpawning();
 
         // TODO 게임 결과 표시
+        Luna.Unity.Playable.InstallFullGame();
+
+        Luna.Unity.LifeCycle.GameEnded();
     }
 
     public GameState GetState()

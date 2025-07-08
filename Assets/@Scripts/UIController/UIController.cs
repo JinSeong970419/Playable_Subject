@@ -14,7 +14,6 @@ public class UIController : MonoBehaviour
     [Header("스코어 정보")]
     public Text scoreText;
 
-    private ScoreSystem _scoreSystem;
     private GameController _gameController;
 
     void Awake()
@@ -29,15 +28,6 @@ public class UIController : MonoBehaviour
             retryButton.onClick.AddListener(OnRetryClicked);
     }
 
-    public void Init(ScoreSystem scoreSystem, GameController gameController)
-    {
-        _scoreSystem = scoreSystem;
-        _gameController = gameController;
-
-        if (_scoreSystem != null)
-            _scoreSystem.OnScoreChanged += UpdateScoreUI;
-    }
-
     private void OnStartClicked()
     {
         if (_gameController != null)
@@ -48,13 +38,6 @@ public class UIController : MonoBehaviour
 
     private void OnRetryClicked()
     {
-        if (_scoreSystem != null)
-            _scoreSystem.ResetScore();
-
-        // 게임 리스타트 버튼 임시
-        //if (_gameController != null)
-        //    _gameController.RestartGame();
-
         ShowResultUI(false);
         ShowStartUI(false);
     }
